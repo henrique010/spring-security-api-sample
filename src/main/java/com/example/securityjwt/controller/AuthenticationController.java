@@ -4,6 +4,7 @@ import com.example.securityjwt.domain.user.AuthenticationDTO;
 import com.example.securityjwt.domain.user.LoginResponseDTO;
 import com.example.securityjwt.domain.user.RegisterUserDTO;
 import com.example.securityjwt.domain.user.User;
+import com.example.securityjwt.service.EmailService;
 import com.example.securityjwt.service.TokenService;
 import com.example.securityjwt.service.UserService;
 import jakarta.validation.Valid;
@@ -23,6 +24,7 @@ public class AuthenticationController {
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
     private TokenService tokenService;
+    private EmailService emailService;
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data) {
         var userNamePassword = new UsernamePasswordAuthenticationToken(data.login(), data.password());
@@ -35,6 +37,11 @@ public class AuthenticationController {
     @PostMapping("/register")
     public ResponseEntity register(@RequestBody @Valid RegisterUserDTO data) {
         this.userService.register(data);
+        this.emailService.send(
+                "Cadastro na plataforma realizado com sucesso",
+                data.login(),
+                "Bem vindo a plataforma"
+        );
         return ResponseEntity.ok().build();
     }
 }
